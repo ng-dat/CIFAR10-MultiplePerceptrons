@@ -33,14 +33,14 @@ class Model:
 
     def __init__(self):
         # TODO: Initialize all hyperparametrs
-        self.input_size = None # Size of image vectors
-        self.num_classes = None # Number of classes/possible labels
-        self.batch_size = None
-        self.learning_rate = None
+        self.input_size = 3*32*32 #3072 # Size of image vectors
+        self.num_classes = 10 # Number of classes/possible labels
+        self.batch_size = 100 # recommended default 100
+        self.learning_rate = 0.005 # recommended default
 
         # TODO: Initialize weights and biases
-        self.W = None
-        self.b = None
+        self.W = np.zeros((self.num_classes, self.input_size))
+        self.b = np.zeros(self.num_classes)
 
     def forward(self, inputs):
         """
@@ -50,9 +50,15 @@ class Model:
         :return: probabilities, probabilities for each class per image # (batch_size x 10)
         """
         # TODO: Write the forward pass logic for your model
-        # TODO: Calculate, then return, the probability for each class per image using the Softmax equation
+        Z = inputs@self.W.T
+        Z[:] += self.b
 
-        pass
+        # TODO: Calculate, then return, the probability for each class per image using the Softmax equation
+        def softmax(z):
+            e_z = np.exp(z - np.max(z))
+            return e_z / e_z.sum()
+        probabilities = np.apply_along_axis(softmax, 1, Z)
+        return probabilities
     
     def loss(self, probabilities, labels):
         """
@@ -64,9 +70,16 @@ class Model:
         :return: average loss per batch element (float)
         """
         # TODO: calculate average cross entropy loss for a batch
+        N = labels.shape[0]
+        # Get one-hot y. (?)Ques: labels is in one-hot or not? -> Assume that they are not in one-hot yet
+        one_hot_y = np.zeros((N, self.num_classes))
+        for n in range(N):
+            one_hot_y[n, labels[n]] = 1.0
+        # Get entropy loss
+        loss = -np.mean(np.sum(one_hot_y * np.log(probabilities), axis=1))
+        # Return
+        return loss
 
-        pass
-    
     def compute_gradients(self, inputs, probabilities, labels):
         """
         Returns the gradients for model's weights and biases 
@@ -79,8 +92,17 @@ class Model:
         :return: gradient for weights,and gradient for biases
         """
         # TODO: calculate the gradients for the weights and the gradients for the bias with respect to average loss
-    
-        pass
+
+        N = labels.shape[0]
+        # Get one-hot y. (?)Ques: labels is in one-hot or not? -> Assume that they are not in one-hot yet
+        one_hot_y = np.zeros((N, self.num_classes))
+        for n in range(N):
+            one_hot_y[n, labels[n]] = 1.0
+        # Get gradients
+        grad_W = (probabilities - one_hot_y).T @ inputs / N
+        grad_b = np.mean(probabilities - one_hot_y, axis=0)
+        # Return
+        return grad_W, grad_b
     
     def accuracy(self, probabilities, labels):
         """
@@ -91,8 +113,10 @@ class Model:
         :return: Float (0,1) that contains batch accuracy
         """
         # TODO: calculate the batch accuracy
-        
-        pass
+        # (?) Ques: description of function is so confusing.
+        predicted_labels = np.argmax(probabilities, axis=1)
+        accuracy = np.sum(predicted_labels == labels) / labels.shape[0]
+        return accuracy
 
     def gradient_descent(self, gradW, gradB):
         '''
@@ -103,8 +127,8 @@ class Model:
         :return: None
         '''
         # TODO: change the weights and biases of the model to descent the gradient
-
-        pass
+        self.W -= gradW * self.learning_rate
+        self.b -= gradB * self.learning_rate
     
 def train(model, train_inputs, train_labels):
     '''
@@ -198,6 +222,9 @@ def main():
     test_inputs, test_labels = get_data('cifar-10-batches-py/test_batch')
 
     # TODO: Create Model
+    model = Model()
+    prob = model.forward(test_inputs)
+    print(prob.shape, prob[0], model.loss(prob, test_labels), model.accuracy(prob, test_labels))
 
     # TODO: Train model by calling train() ONCE on all data
 
