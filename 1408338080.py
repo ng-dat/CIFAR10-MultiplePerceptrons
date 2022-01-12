@@ -12,7 +12,13 @@ def get_data(inputs_file_path):
     :return: NumPy array of inputs as float32 and labels as int8
     """
     #TODO: Load inputs and labels
+    file = open(inputs_file_path, 'rb')
+    raw_data = pickle.load(file, encoding='bytes')
+    inputs = raw_data[b'data'].astype('float32')
+    labels = np.array(raw_data[b'labels'], dtype='int8')
     #TODO: Normalize inputs
+    inputs /= 255.0
+    return inputs, labels
 
 class Model:
     """
@@ -184,6 +190,12 @@ def main():
     '''
 
     # TODO: load CIFAR10 train and test examples into train_inputs, train_labels, test_inputs, test_labels
+    train_inputs, train_labels = get_data('cifar-10-batches-py/data_batch_1')
+    for i in range(2,6):
+        batch_i_images, batch_i_labels = get_data('cifar-10-batches-py/data_batch_'+str(i))
+        train_inputs = np.append(train_inputs, batch_i_images, axis=0)
+        train_labels = np.append(train_labels, batch_i_labels, axis=0)
+    test_inputs, test_labels = get_data('cifar-10-batches-py/test_batch')
 
     # TODO: Create Model
 
