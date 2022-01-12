@@ -243,6 +243,12 @@ def main():
     # test(model, test_inputs, test_labels)
 
     # TODO: Visualize the data by using visualize_results() on a set of 10 examples
-    
+    num_samples = 10
+    sample_inputs = test_inputs[:num_samples]
+    sample_labels = test_labels[:num_samples]
+    predicted_prob = model.forward(sample_inputs)
+    visualize_results(sample_inputs, predicted_prob, sample_labels)
+
+
 if __name__ == '__main__':
     main()
