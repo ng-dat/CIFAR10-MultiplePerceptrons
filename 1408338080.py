@@ -140,9 +140,20 @@ def train(model, train_inputs, train_labels):
     :return: None
     '''
     # TODO: Iterate over the training inputs and labels, in model.batch_size increments
+    N = train_labels.shape[0]
+    batch_num = (N+1) // model.batch_size
+    losses = []
+    for batch_idx in range(batch_num):
+        batch_inputs = train_inputs[batch_idx * model.batch_size : (batch_idx + 1) * model.batch_size, :]
+        batch_labels = train_labels[batch_idx * model.batch_size : (batch_idx + 1) * model.batch_size]
     # TODO: For every batch, compute then descend the gradients for the model's weights
+        predicted_prob = model.forward(batch_inputs)
+        grad_W, grad_b = model.compute_gradients(batch_inputs, predicted_prob, batch_labels)
+        model.gradient_descent(grad_W, grad_b)
     # Optional TODO: Call visualize_loss and observe the loss per batch as the model trains.
-    pass
+        losses.append(model.loss(predicted_prob, batch_labels))
+    print(losses)
+    visualize_loss(losses)
 
 def test(model, test_inputs, test_labels):
     """
@@ -176,6 +187,7 @@ def visualize_loss(losses):
     plt.plot(x, losses, color='r')
     plt.draw()
     plt.pause(0.001)
+
 
 def visualize_results(image_inputs, probabilities, image_labels):
     """
@@ -223,16 +235,14 @@ def main():
 
     # TODO: Create Model
     model = Model()
-    prob = model.forward(test_inputs)
-    print(prob.shape, prob[0], model.loss(prob, test_labels), model.accuracy(prob, test_labels))
 
     # TODO: Train model by calling train() ONCE on all data
+    train(model, train_inputs, train_labels)
 
     # TODO: Test the accuracy by calling test() after running train()
+    # test(model, test_inputs, test_labels)
 
     # TODO: Visualize the data by using visualize_results() on a set of 10 examples
-
-    pass
     
 if __name__ == '__main__':
     main()
