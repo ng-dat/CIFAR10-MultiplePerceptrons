@@ -71,7 +71,7 @@ class Model:
         """
         # TODO: calculate average cross entropy loss for a batch
         N = labels.shape[0]
-        # Get one-hot y. (?)Ques: labels is in one-hot or not? -> Assume that they are not in one-hot yet
+        # Get one-hot y. (?) Question: labels is in one-hot or not? -> Assume that they are not in one-hot yet
         one_hot_y = np.zeros((N, self.num_classes))
         for n in range(N):
             one_hot_y[n, labels[n]] = 1.0
@@ -94,7 +94,7 @@ class Model:
         # TODO: calculate the gradients for the weights and the gradients for the bias with respect to average loss
 
         N = labels.shape[0]
-        # Get one-hot y. (?)Ques: labels is in one-hot or not? -> Assume that they are not in one-hot yet
+        # Get one-hot y. (?) Question: labels is in one-hot or not? -> Assume that they are not in one-hot yet
         one_hot_y = np.zeros((N, self.num_classes))
         for n in range(N):
             one_hot_y[n, labels[n]] = 1.0
@@ -113,9 +113,12 @@ class Model:
         :return: Float (0,1) that contains batch accuracy
         """
         # TODO: calculate the batch accuracy
-        # (?) Ques: description of function is so confusing.
+        # (?) Question: description of function is so confusing.
+        #           - What means "comparing the number of correct predictions with the correct answers"? Why "correct prediction" is different from "correct answers"?
+        #           - The "accuracy" in Algorithm1 pseudocode takes the parameters that is from only 1 sample at time. But this function takes multiple sample
+        #           - Also that function takes the predicted label as paramater while this function takes predicted probabilities?
         predicted_labels = np.argmax(probabilities, axis=1)
-        accuracy = np.sum(predicted_labels == labels) / labels.shape[0]
+        accuracy = np.mean(predicted_labels == labels)
         return accuracy
 
     def gradient_descent(self, gradW, gradB):
@@ -152,7 +155,6 @@ def train(model, train_inputs, train_labels):
         model.gradient_descent(grad_W, grad_b)
     # Optional TODO: Call visualize_loss and observe the loss per batch as the model trains.
         losses.append(model.loss(predicted_prob, batch_labels))
-    print(losses)
     visualize_loss(losses)
 
 def test(model, test_inputs, test_labels):
@@ -163,9 +165,10 @@ def test(model, test_inputs, test_labels):
     :return: accuracy - Float (0,1)
     """
     # TODO: Iterate over the testing inputs and labels
+    # (?) Question: can we use vector instead of running for loop? -> Assume yes
+    predicted_prob = model.forward(test_inputs)
     # TODO: Return accuracy across testing set
-    
-    pass
+    return model.accuracy(predicted_prob, test_labels)
 
 def visualize_loss(losses):
     """
@@ -240,7 +243,9 @@ def main():
     train(model, train_inputs, train_labels)
 
     # TODO: Test the accuracy by calling test() after running train()
-    # test(model, test_inputs, test_labels)
+    test_acc = test(model, test_inputs, test_labels)
+    print('Test accuracy:')
+    print(f'{test_acc:.4f}')
 
     # TODO: Visualize the data by using visualize_results() on a set of 10 examples
     num_samples = 10
