@@ -35,8 +35,8 @@ class Model:
         # TODO: Initialize all hyperparametrs
         self.input_size = 3*32*32 #3072 # Size of image vectors
         self.num_classes = 10 # Number of classes/possible labels
-        self.batch_size = 100 # recommended default 100
-        self.learning_rate = 0.005 # recommended default
+        self.batch_size = 50 #100 # recommended default 100
+        self.learning_rate = 0.01# 0.005 # recommended default
 
         # TODO: Initialize weights and biases
         self.W = np.zeros((self.num_classes, self.input_size))
