@@ -229,12 +229,13 @@ def main():
     '''
 
     # TODO: load CIFAR10 train and test examples into train_inputs, train_labels, test_inputs, test_labels
-    train_inputs, train_labels = get_data('cifar-10-batches-py/data_batch_1')
+    # (?) Question: What are the links to data files. -> Assume they are ./data_batch_1, ./data_batch_2, ..., ./test_batch
+    train_inputs, train_labels = get_data('data_batch_1')
     for i in range(2,6):
-        batch_i_images, batch_i_labels = get_data('cifar-10-batches-py/data_batch_'+str(i))
+        batch_i_images, batch_i_labels = get_data('data_batch_'+str(i))
         train_inputs = np.append(train_inputs, batch_i_images, axis=0)
         train_labels = np.append(train_labels, batch_i_labels, axis=0)
-    test_inputs, test_labels = get_data('cifar-10-batches-py/test_batch')
+    test_inputs, test_labels = get_data('test_batch')
 
     # TODO: Create Model
     model = Model()
